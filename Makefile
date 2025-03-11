@@ -3,3 +3,6 @@ init:
 
 fix_origin:
 	git remote set-url origin git@github.com:dimitry12/configs.git
+
+after_config_change:
+	chezmoi init
