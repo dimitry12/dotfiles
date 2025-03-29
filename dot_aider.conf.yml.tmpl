@@ -1,6 +1,7 @@
 anthropic-api-key: {{ .anthropic_api_key_aider | quote }}
 api-key:
 - deepseek={{ .deepseek_api_key_aider | quote }}
+- gemini={{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.gemini_api }}
 
 model: sonnet
 

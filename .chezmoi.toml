@@ -1,6 +1,0 @@
-encryption = "gpg"
-[gpg]
-  recipient = "0x5AB6D0DF0F9A3055"
-
-[data]
-gpg_key = "0x5AB6D0DF0F9A3055"

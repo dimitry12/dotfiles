@@ -9,3 +9,6 @@ after_config_change:
 
 check_data:
 	chezmoi data
+
+check_template:
+	chezmoi execute-template path_or_string

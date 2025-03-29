@@ -1,7 +1,12 @@
 {{- $anthropic_api_key_aider := promptStringOnce . "anthropic_api_key_aider" "anthropic_api_key_aider" -}}
 {{- $deepseek_api_key_aider := promptStringOnce . "deepseek_api_key_aider" "deepseek_api_key_aider" -}}
 
+encryption = "gpg"
+[gpg]
+  recipient = "0x5AB6D0DF0F9A3055"
+
 [data]
+gpg_key = "0x5AB6D0DF0F9A3055"
 anthropic_api_key_aider = {{ $anthropic_api_key_aider | quote }}
 deepseek_api_key_aider = {{ $deepseek_api_key_aider | quote }}
 
