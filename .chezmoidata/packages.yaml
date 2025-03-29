@@ -4,6 +4,9 @@ packages:
       - neovim
       - tmux
       - gnupg2
+      - lazygit
+      - sops
+      - go # TODO: migrate to go-managed packages where possible instead of macports
   termux:
     - git
     - fzf
@@ -14,6 +17,9 @@ packages:
     - rust
     - python
     - uv
+    - lazygit
+    - sops
+    - golang
     # - alacritty
     # - kitty
     # - libxkbcommon
@@ -38,6 +44,7 @@ packages:
     - ttok
     - files-to-prompt
     - strip-tags
+    - dvc
     - aider-chat@latest
   llm_plugins:
     - llm-ollama
