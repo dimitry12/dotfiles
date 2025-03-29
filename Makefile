@@ -6,3 +6,6 @@ fix_origin:
 
 after_config_change:
 	chezmoi init
+
+check_data:
+	chezmoi data
