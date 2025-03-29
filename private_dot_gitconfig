@@ -1,3 +1,5 @@
 [user]
 	email = dzmitry@pletnikau.com
 	name = Dzmitry Pletnikau
+[pull]
+	rebase = false
