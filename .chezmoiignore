@@ -6,7 +6,7 @@ termux.Makefile
 .termux/*
 {{ end }}
 {{ if ne .chezmoi.os "darwin" }}
-Library/Application\ Support/io.datasette.llm/default_model.txt
+Library/Application\ Support/*
 {{ end }}
 {{ if ne .chezmoi.os "linux" }}
 .config/io.datasette.llm/default_model.txt
