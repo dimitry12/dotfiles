@@ -1,7 +1,7 @@
-anthropic-api-key: {{ .anthropic_api_key_aider | quote }}
+anthropic-api-key: {{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.anthropic_api | quote }}
 api-key:
-- deepseek={{ .deepseek_api_key_aider | quote }}
-- gemini={{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.gemini_api }}
+- deepseek={{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.deepseek_api | quote }}
+- gemini={{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.gemini_api | quote }}
 
 model: sonnet
 

@@ -1,0 +1,5 @@
+{
+  "openai": {{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.openai_api | quote }},
+  "gemini": {{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.gemini_api | quote }},
+  "anthropic": {{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.anthropic_api | quote }}
+}

@@ -1,1 +1,1 @@
-{{- template "llm_default_model.txt" . -}}
+{{ includeTemplate (joinPath .chezmoi.sourceDir "dot_config" "io.datasette.llm" "default_model.txt.tmpl") .chezmoi }}
