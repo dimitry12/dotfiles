@@ -40,8 +40,6 @@ eval $(okc-ssh-agent)
 {{ if eq .chezmoi.os "darwin" }}
 export PATH=/Library/TeX/texbin:/opt/local/bin:/opt/local/sbin:$PATH:/usr/local/share/dotnet
 export PATH=~/.local/bin/:$PATH
-export PATH=/usr/local/go/bin:$PATH
-export PATH=~/go/bin/:$PATH
 export MANPATH=/opt/local/share/man:$MANPATH
 export PIPENV_VENV_IN_PROJECT="enabled"
 
@@ -233,3 +231,4 @@ export UV_PYTHON="3.12"
 export UV_PYTHON_PREFERENCE="only-managed"
 export UV_CACHE_DIR="$HOME/Desktop/uv_cache" # to make sure cache and code-folders are on the same file system
 {{ end }}
+export PATH="$PATH:$(go env GOPATH)/bin"
