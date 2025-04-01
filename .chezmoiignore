@@ -2,12 +2,12 @@ llm.txt
 Makefile
 
 {{ if ne .chezmoi.os "android" -}}
-termux.Makefile
-.termux/*
+termux*
+.termux
 {{ end }}
 {{ if ne .chezmoi.os "darwin" }}
-Library/Application\ Support/*
+Library/Application\ Support
 {{ end }}
 {{ if ne .chezmoi.os "linux" }}
-.config/io.datasette.llm/default_model.txt
+.config/io.datasette.llm
 {{ end }}
