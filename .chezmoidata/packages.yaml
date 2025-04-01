@@ -21,6 +21,10 @@ packages:
     - lazygit
     - sops
     - golang
+    - x11-repo
+    - termux-x11-nightly
+    - xfce
+    - firefox
     # - alacritty
     # - kitty
     # - libxkbcommon
