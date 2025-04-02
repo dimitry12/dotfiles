@@ -1,0 +1,1 @@
+{{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.openai_api }}
