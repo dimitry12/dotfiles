@@ -22,6 +22,12 @@ pkg install {{ . | quote }}
 sudo port install {{ . | quote }}
 {{ end -}}
 
+# Install packages that use shell commands
+{{ range $name, $install := .packages.darwin.shell_installs -}}
+echo "Installing {{ $name }}..."
+{{ $install.command }}
+{{ end -}}
+
 {{ end -}}
 
 {{ if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") -}}
