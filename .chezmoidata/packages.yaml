@@ -8,6 +8,11 @@ packages:
       - sops
       - go # TODO: migrate to go-managed packages where possible instead of macports
       - zk
+    shell_installs:
+      rust:
+        command: "curl https://sh.rustup.rs -sSf"
+      tickrs:
+        command: "cargo install tickrs"
   termux:
     - git
     - fzf
@@ -54,6 +59,7 @@ packages:
     - dvc
     - visidata
     - aider-chat@latest
+    - python-dotenv
   llm_plugins:
     - llm-ollama
     - llm-gemini
