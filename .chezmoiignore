@@ -1,5 +1,6 @@
 llm.txt
 Makefile
+sidebery_settings.json
 
 {{ if ne .chezmoi.os "android" -}}
 termux*
