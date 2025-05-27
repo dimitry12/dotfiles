@@ -5,7 +5,9 @@
 vim.g.ai_cmp = false
 
 vim.api.nvim_create_user_command("Cppath", function()
-  local path = vim.fn.expand("%:p")
-  vim.fn.setreg("+", path)
-  vim.notify('Copied "' .. path .. '" to the clipboard!')
+	local path = vim.fn.expand("%:p")
+	vim.fn.setreg("+", path)
+	vim.notify('Copied "' .. path .. '" to the clipboard!')
 end, {})
+
+vim.opt.colorcolumn = "80"
