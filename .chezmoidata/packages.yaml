@@ -13,6 +13,8 @@ packages:
         command: "curl https://sh.rustup.rs -sSf"
       tickrs:
         command: "cargo install tickrs"
+      golang:
+        command: "go install github.com/charmbracelet/glow@latest"
   termux:
     - git
     - fzf
@@ -65,3 +67,4 @@ packages:
     - llm-gemini
     - llm-anthropic
     - llm-deepseek
+    - llm-sentence-transformers
