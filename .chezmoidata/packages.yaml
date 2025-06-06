@@ -13,6 +13,8 @@ packages:
         command: "curl https://sh.rustup.rs -sSf"
       tickrs:
         command: "cargo install tickrs"
+      git-delta:
+        command: "cargo install git-delta"
       golang:
         command: "go install github.com/charmbracelet/glow@latest"
   termux:
