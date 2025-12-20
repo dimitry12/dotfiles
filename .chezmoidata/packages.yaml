@@ -42,6 +42,8 @@ packages:
     - wget
     - cmake
     - build-essential
+    - syncthing
+    - mutt
   linux:
     ubuntu:
       - neovim
