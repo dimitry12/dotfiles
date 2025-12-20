@@ -1,0 +1,7 @@
+return {
+  "jamessan/vim-gnupg",
+  init = function()
+    vim.g.GPGPreferArmor = 1
+    vim.g.GPGDefaultRecipients = { "{{ .gpg_key }}" }
+  end,
+}
