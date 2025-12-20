@@ -1,0 +1,1 @@
+ANTHROPIC_API_KEY={{ (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys.anthropic_api }}
