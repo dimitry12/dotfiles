@@ -1,0 +1,19 @@
+#!/bin/bash
+# za - zellij attach to a specific session and tab
+# Usage: za <session> [tab-name-or-number]
+
+SESSION="${1:?Usage: za <session> [tab-name-or-number]}"
+TAB="$2"
+
+if [ -n "$TAB" ]; then
+    (
+        sleep 0.5
+        if [[ "$TAB" =~ ^[0-9]+$ ]]; then
+            ZELLIJ_SESSION_NAME="$SESSION" zellij action go-to-tab "$TAB"
+        else
+            ZELLIJ_SESSION_NAME="$SESSION" zellij action go-to-tab-name "$TAB"
+        fi
+    ) &
+fi
+
+exec zellij attach "$SESSION" -c
