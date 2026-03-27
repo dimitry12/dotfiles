@@ -8,6 +8,8 @@ packages:
       - sops
       - go # TODO: migrate to go-managed packages where possible instead of macports
       - zk
+    homebrew:
+      - hivemind
     shell_installs:
       rust:
         command: "curl https://sh.rustup.rs -sSf"
