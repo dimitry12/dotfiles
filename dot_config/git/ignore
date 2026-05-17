@@ -1,0 +1,7 @@
+**/.claude/settings.local.json
+
+# Pi sandbox extension local caches/config
+.uv-cache/
+.dvc-global-config/
+.dvc-system-config/
+.dvc-site-cache/

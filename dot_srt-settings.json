@@ -1,0 +1,24 @@
+{
+  "allowPty": true,
+  "network": {
+    "allowedDomains": [],
+    "deniedDomains": []
+  },
+  "filesystem": {
+    "denyRead": ["/Users"],
+    "allowRead": [
+      ".",
+      "~/.gitconfig",
+      "~/.config/git/ignore",
+      "~/.local/bin",
+      "~/.local/share/uv/python",
+      "~/.local/share/uv/tools/dvc",
+      "~/.nvm/versions/node/v24.12.0"
+    ],
+    "allowWrite": ["."],
+    "denyWrite": [
+      "/comment protect the file history in case agent wrecks worktree",
+      "./.git"
+    ]
+  }
+}
