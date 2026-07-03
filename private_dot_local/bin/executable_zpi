@@ -1,0 +1,65 @@
+#!/usr/bin/env sh
+set -eu
+
+dry=0
+case "${1:-}" in
+    --dry|--dry-run|-n)
+        dry=1
+        shift
+        ;;
+esac
+
+project_name_from_path() {
+    path=${1%/}
+    last_segment=${path##*/}
+    parent_path=${path%/*}
+    parent_segment=${parent_path##*/}
+
+    if [ "${last_segment:-}" = ".pi" ]; then
+        printf '%s\n' "${parent_segment:-project}-pi"
+    else
+        printf '%s\n' "${last_segment:-project}"
+    fi
+}
+
+workspace_path=$PWD
+
+# When invoked from a linked Git worktree, use the main worktree path as the
+# stable workspace identity. This keeps branch-specific worktrees attached to
+# the same zmx/pi workspace instead of deriving separate slugs from temporary
+# worktree directory names. Normal repositories keep the old cwd-based behavior.
+if command -v git >/dev/null 2>&1 && [ "$(git rev-parse --is-inside-work-tree 2>/dev/null || true)" = "true" ]; then
+    current_worktree=$(git rev-parse --show-toplevel 2>/dev/null || true)
+    main_worktree=$(git worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p')
+    if [ -n "${current_worktree:-}" ] && [ -n "${main_worktree:-}" ] && [ "$current_worktree" != "$main_worktree" ]; then
+        workspace_path=$main_worktree
+    fi
+fi
+
+default_project=$(project_name_from_path "$workspace_path")
+project=${PI_WORKSPACE_PROJECT:-$default_project}
+
+# Treat the workspace directory basename as a stable project name. For linked
+# Git worktrees, the workspace directory is the main worktree location;
+# otherwise it is the current directory. Special-case nested .pi workdirs as
+# <parent>-pi to avoid every .pi folder collapsing into the same workspace identity.
+# Pi stores JSONL sessions in a one-level directory under its normal sessions
+# root so /resume/list-all can still discover them, but the directory no longer
+# encodes the absolute cwd.
+slug=$(printf '%s' "$project" | LC_ALL=C tr -c 'A-Za-z0-9._-' '-')
+[ -n "$slug" ] || slug=project
+
+session_root=${PI_WORKSPACE_SESSION_ROOT:-$HOME/.pi/agent/sessions}
+session_dir=$session_root/--workspace-$slug--
+
+if [ "$dry" = "1" ]; then
+    printf '%s\n' "$slug"
+    exit 0
+fi
+
+permission_gate_env=$HOME/.env/PI_PERMISSION_GATE_NTFY_TOPIC
+if [ -r "$permission_gate_env" ]; then
+    . "$permission_gate_env"
+fi
+
+exec zmx a "$slug.pi" pi --session-dir "$session_dir" "$@"
