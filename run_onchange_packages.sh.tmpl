@@ -24,7 +24,11 @@ sudo port install {{ . | quote }}
 
 # Install Homebrew packages
 {{ range .packages.darwin.homebrew -}}
-brew install {{ . | quote }}
+if command -v {{ . | quote }} >/dev/null 2>&1; then
+  echo "{{ . }} already available; skipping brew install {{ . }}."
+else
+  brew install {{ . | quote }}
+fi
 {{ end -}}
 
 # Install packages that use shell commands
@@ -35,27 +39,67 @@ echo "Installing {{ $name }}..."
 
 {{ end -}}
 
-{{ if and (eq .chezmoi.os "linux") (eq .chezmoi.osRelease.id "ubuntu") -}}
+{{ if eq .chezmoi.os "linux" -}}
 
-# Add repos
-sudo add-apt-repository ppa:neovim-ppa/unstable
-# Update package lists
-sudo apt update
+# Linux uses Homebrew for CLI/dev tools across mutable and atomic distributions
+# such as Ubuntu, Fedora Workstation, and Fedora Silverblue.
+if ! command -v brew >/dev/null 2>&1; then
+  if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  elif [ -x "$HOME/.linuxbrew/bin/brew" ]; then
+    eval "$("$HOME/.linuxbrew/bin/brew" shellenv)"
+  else
+    echo "Homebrew is required for Linux package installation."
+    echo "Install it from https://brew.sh/ and re-run chezmoi apply."
+    exit 1
+  fi
+else
+  eval "$(brew shellenv)"
+fi
 
-# Install declared packages
-{{ range .packages.linux.ubuntu -}}
-sudo apt install -y {{ . | quote }}
+# Install Homebrew packages. Skip packages whose primary binary is already
+# available, which helps when a base distro or toolbox already provides them.
+{{ range .packages.linux.homebrew -}}
+if command -v {{ .binary | quote }} >/dev/null 2>&1; then
+  echo "{{ .binary }} already available; skipping brew install {{ .name }}."
+else
+  brew install {{ .name | quote }}
+fi
 {{ end -}}
 
-# Install packages that use shell commands
-{{ range $name, $install := .packages.linux.shell_installs -}}
-echo "Installing {{ $name }}..."
-{{ $install.command }}
+# Install Flatpak applications when Flatpak is available.
+if command -v flatpak >/dev/null 2>&1; then
+  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+{{ range .packages.linux.flatpak -}}
+  flatpak install -y flathub {{ . | quote }}
 {{ end -}}
+else
+  echo "flatpak not found; skipping Linux GUI/app Flatpaks."
+fi
 
 {{ end -}}
 
 # Cross-platform shell-based installations
+
+# npm global package installations
+{{ if and (ne .chezmoi.os "android") .packages.npm_global -}}
+# Install npm global packages
+if command -v npm >/dev/null 2>&1; then
+{{ range .packages.npm_global -}}
+  if command -v {{ .binary | quote }} >/dev/null 2>&1; then
+    echo "{{ .binary }} already available; skipping npm install -g {{ .package }}."
+  else
+{{- if hasKey . "version" }}
+    npm install -g {{ .args }} {{ printf "%s@%s" .package .version | quote }}
+{{- else }}
+    npm install -g {{ .args }} {{ .package | quote }}
+{{- end }}
+  fi
+{{ end -}}
+else
+  echo "npm not found; skipping npm global packages."
+fi
+{{ end -}}
 
 # UV tool package installations
 {{ if .packages.uv_tool -}}
@@ -63,15 +107,6 @@ echo "Installing {{ $name }}..."
 {{ range .packages.uv_tool -}}
 echo "Installing UV package {{ . }}..."
 uv tool install {{ . }}
-{{ end -}}
-{{ end -}}
-
-# LLM plugin installations
-{{ if .packages.llm_plugins -}}
-# Install LLM plugins
-{{ range .packages.llm_plugins -}}
-echo "Installing LLM plugin {{ . }}..."
-llm install {{ . }}
 {{ end -}}
 {{ end -}}
 

@@ -7,7 +7,12 @@
   },
   "filesystem": {
     "denyRead": [
+{{- if eq .chezmoi.os "darwin" }}
       "/Users"
+{{- else if eq .chezmoi.os "linux" }}
+      "/home",
+      "/var/home"
+{{- end }}
     ],
     "allowRead": [
       ".",
@@ -15,10 +20,13 @@
       "~/.config/git/ignore",
       "~/.local/bin",
       "~/.local/share/uv/python",
-      "~/.local/share/uv/tools/dvc",
+      "~/.local/share/uv/tools/dvc"{{ if eq .chezmoi.os "darwin" }},
       "~/.nvm/versions/node/v24.12.0",
       "~/Programs/flutter",
-      "~/.pub-cache"
+      "~/.pub-cache"{{ else if eq .chezmoi.os "linux" }},
+      "~/.linuxbrew",
+      "/home/linuxbrew/.linuxbrew",
+      "~/.cache/Homebrew"{{ end }}
     ],
     "allowWrite": [
       ".",

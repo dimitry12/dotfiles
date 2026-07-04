@@ -1,0 +1,32 @@
+#!{{ lookPath "bash" }}
+set -euo pipefail
+
+{{ if ne .chezmoi.os "android" -}}
+if ! command -v npm >/dev/null 2>&1; then
+  echo "npm not found; skipping Pi agent extension/skill dependency installation."
+  exit 0
+fi
+
+install_npm_deps() {
+  local dir="$1"
+
+  if [ ! -d "$dir" ]; then
+    echo "Pi resource dependency directory missing; skipping: $dir"
+    return 0
+  fi
+
+  if [ ! -f "$dir/package-lock.json" ]; then
+    echo "No package-lock.json; skipping: $dir"
+    return 0
+  fi
+
+  echo "Installing Pi resource npm dependencies: $dir"
+  (cd "$dir" && npm ci --ignore-scripts)
+}
+
+install_npm_deps "$HOME/.pi/contrib/dzmitry/pi-extensions/permission-gate"
+install_npm_deps "$HOME/.pi/contrib/dzmitry/pi-extensions/sandbox"
+install_npm_deps "$HOME/.pi/contrib/dzmitry/pi-skills/web-browser/scripts"
+{{ else -}}
+echo "Android/Termux detected; skipping Pi agent extension/skill npm dependencies."
+{{ end -}}

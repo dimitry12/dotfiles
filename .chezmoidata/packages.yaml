@@ -45,18 +45,52 @@ packages:
     - syncthing
     - mutt
   linux:
-    ubuntu:
-      - neovim
-      - fd-find
-      - ripgrep
-      - fzf
-      - sops
-      - zk
-    shell_installs:
-      uv:
-        command: "curl -LsSf https://astral.sh/uv/install.sh | sh"
+    homebrew:
+      - name: fd
+        binary: fd
+      - name: fzf
+        binary: fzf
+      - name: gh
+        binary: gh
+      - name: git
+        binary: git
+      - name: git-delta
+        binary: delta
+      - name: glow
+        binary: glow
+      - name: gnupg
+        binary: gpg
+      - name: go
+        binary: go
+      - name: lazygit
+        binary: lazygit
+      - name: neovim
+        binary: nvim
+      - name: node
+        binary: npm
+      - name: pinentry
+        binary: pinentry
+      - name: ripgrep
+        binary: rg
+      - name: shfmt
+        binary: shfmt
+      - name: sops
+        binary: sops
+      - name: uv
+        binary: uv
+      - name: zk
+        binary: zk
+      - name: zmx
+        binary: zmx
+      - name: zoxide
+        binary: zoxide
+    flatpak:
+      - org.wezfurlong.wezterm
+  npm_global:
+    - package: "@earendil-works/pi-coding-agent"
+      binary: "pi"
+      args: "--ignore-scripts"
   uv_tool:
-    - llm
     - shot-scraper
     - ttok
     - files-to-prompt
@@ -64,9 +98,3 @@ packages:
     - dvc
     - visidata
     - python-dotenv
-  llm_plugins:
-    - llm-ollama
-    - llm-gemini
-    - llm-anthropic
-    - llm-deepseek
-    - llm-sentence-transformers

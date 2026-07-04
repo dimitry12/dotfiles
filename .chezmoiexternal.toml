@@ -1,4 +1,4 @@
 [".pi/contrib/dzmitry"]
     type = "git-repo"
-    url = "git@github.com:dimitry12/agent-stuff.git"
+    url = "https://github.com/dimitry12/agent-stuff.git"
     refreshPeriod = "168h"
