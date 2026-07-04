@@ -55,11 +55,18 @@ For a new desktop Linux machine, the intended bootstrap is:
 1. Install Homebrew.
 2. Install chezmoi.
 3. Clone/init this repository as the chezmoi source state.
-4. Prepare GPG/YubiKey before first full apply:
+4. Ensure the Flathub Flatpak remote is enabled (manual one-time step):
+   - `flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo`
+   - `flatpak remote-modify --enable flathub` (requires sudo on most hosts)
+   - Fedora ships `flathub` as a **disabled** system remote, so it must be
+     enabled before `chezmoi apply` can install Flatpak apps like WezTerm.
+     The onchange package script will also try to enable it, but the remote
+     itself must first exist and be user-enabled.
+5. Prepare GPG/YubiKey before first full apply:
    - import the public key from `dot_0x5AB6D0DF0F9A3055.asc`
    - run `gpg --card-status` with the YubiKey inserted so GPG can discover the
      smartcard-backed secret key stubs
-5. Run `chezmoi apply`.
+6. Run `chezmoi apply`.
 
 The GPG private key is expected to live on a YubiKey, not in this repository and
 not as an importable private-key file. On Fedora Silverblue or other atomic

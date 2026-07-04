@@ -77,6 +77,8 @@ brew install {{ .name | quote }}
 # Install Flatpak applications when Flatpak is available.
 if command -v flatpak >/dev/null 2>&1; then
   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  # Fedora ships flathub as a disabled remote; ensure it is enabled so installs succeed.
+  flatpak remote-modify --enable flathub 2>/dev/null || true
 {{ range .packages.linux.flatpak -}}
   flatpak install -y flathub {{ . | quote }}
 {{ end -}}
