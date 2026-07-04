@@ -1,0 +1,43 @@
+{
+  "providers": {
+    "llama-cpp": {
+      "baseUrl": "http://tr:8080/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "compat": {
+        "supportsUsageInStreaming": false
+      },
+      "models": [
+        {
+          "id": "qwen3-30b-a3b",
+          "name": "Qwen3 30B-A3B (tr)",
+          "reasoning": false,
+          "input": ["text"],
+          "contextWindow": 262144,
+          "maxTokens": 8192,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        }
+      ]
+    },
+    "openrouter": {
+      "models": [
+        {
+          "id": "z-ai/glm-5.2",
+          "name": "Z.ai GLM 5.2 (Z.AI fp8 via OpenRouter)",
+          "reasoning": true,
+          "input": ["text"],
+          "contextWindow": 1048576,
+          "maxTokens": 131072,
+          "cost": { "input": 1.4, "output": 4.4, "cacheRead": 0.26, "cacheWrite": 0 },
+          "compat": {
+            "thinkingFormat": "openrouter",
+            "openRouterRouting": {
+              "only": ["z-ai/fp8"],
+              "allow_fallbacks": false
+            }
+          }
+        }
+      ]
+    }
+  }
+}

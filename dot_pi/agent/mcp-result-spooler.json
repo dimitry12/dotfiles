@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "outputDir": ".pi/mcp-results",
+  "logFile": ".pi/mcp-result-spooler.log",
+  "minTextChars": 0,
+  "previewChars": 2000,
+  "includeDetails": true,
+  "includeInput": true,
+  "spoolErrors": true,
+  "match": {
+    "sourceIncludes": ["pi-mcp-adapter"],
+    "labelPrefixes": ["MCP:"],
+    "namePrefixes": [],
+    "nameExcludes": ["mcp"]
+  }
+}

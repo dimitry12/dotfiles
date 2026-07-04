@@ -1,0 +1,18 @@
+{
+  "lastChangelogVersion": "0.80.2",
+  "theme": "light",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.5",
+  "defaultThinkingLevel": "high",
+  "enabledModels": [
+    "llama-cpp/qwen3-30b-a3b",
+    "openai-codex/gpt-5.4",
+    "openai-codex/gpt-5.5",
+    "deepseek/deepseek-v4-pro",
+    "openrouter/z-ai/glm-5.2"
+  ],
+  "packages": [
+    "git:github.com/nicobailon/pi-prompt-template-model@v0.9.3",
+    "git:github.com/nicobailon/pi-mcp-adapter@v2.8.0"
+  ]
+}
