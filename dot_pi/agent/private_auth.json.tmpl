@@ -1,0 +1,11 @@
+{{- $keys := (join .chezmoi.sourceDir ".encrypted_keys.toml.asc" | include | decrypt | fromToml).keys -}}
+{
+  "deepseek": {
+    "type": "api_key",
+    "key": {{ $keys.deepseek_api | quote }}
+  },
+  "openrouter": {
+    "type": "api_key",
+    "key": {{ $keys.openrouter_api | quote }}
+  }
+}
