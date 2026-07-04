@@ -1,11 +1,14 @@
 {
   "allowPty": true,
+  "enableWeakerNetworkIsolation": true,
   "network": {
     "allowedDomains": [],
     "deniedDomains": []
   },
   "filesystem": {
-    "denyRead": ["/Users"],
+    "denyRead": [
+      "/Users"
+    ],
     "allowRead": [
       ".",
       "~/.gitconfig",
@@ -13,12 +16,21 @@
       "~/.local/bin",
       "~/.local/share/uv/python",
       "~/.local/share/uv/tools/dvc",
-      "~/.nvm/versions/node/v24.12.0"
+      "~/.nvm/versions/node/v24.12.0",
+      "~/Programs/flutter",
+      "~/.pub-cache"
     ],
-    "allowWrite": ["."],
+    "allowWrite": [
+      ".",
+      "./.pi/mcp-results/"
+    ],
     "denyWrite": [
       "/comment protect the file history in case agent wrecks worktree",
-      "./.git"
+      "./.git",
+      "./.pi",
+      "./.pi/sandbox.json",
+      "./.pi/mcp.json",
+      "./.pi/mcp-result-spooler.json"
     ]
   }
 }

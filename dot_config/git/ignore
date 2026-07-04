@@ -5,3 +5,5 @@
 .dvc-global-config/
 .dvc-system-config/
 .dvc-site-cache/
+.dart-tool/
+.dartServer/
