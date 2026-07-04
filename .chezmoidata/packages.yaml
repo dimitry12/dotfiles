@@ -46,6 +46,21 @@ packages:
     - mutt
   linux:
     homebrew:
+      # glibc must precede gcc: brew's gcc postinstall has two branches and
+      # takes the self-contained one (using glibc.opt_lib for crt objects) only
+      # when brew's glibc is installed. Otherwise it probes /usr/bin/cc, which
+      # does not exist on Fedora Silverblue (no glibc-devel on the atomic host),
+      # the postinstall fails, the unversioned gcc/cc symlinks are never
+      # created, and DevelopmentTools.installed? returns false - blocking every
+      # non-bottled formula install, including prebuilt-binary formulas.
+      - name: glibc
+        # keg-only: no `binary` skip-check, since its binaries (ld.so, ldd,
+        # ldconfig) shadow system runtime tools and `command -v` would always
+        # find the system copy. Always `brew install` (idempotent).
+      # gcc provides the unversioned gcc/cc/g++/c++ symlinks that Homebrew's
+      # DevelopmentTools gate checks for. Depends on glibc above.
+      - name: gcc
+        binary: gcc
       - name: fd
         binary: fd
       - name: fzf
@@ -74,13 +89,18 @@ packages:
         binary: rg
       - name: shfmt
         binary: shfmt
+      - name: socat
+        binary: socat
       - name: sops
         binary: sops
       - name: uv
         binary: uv
       - name: zk
         binary: zk
-      - name: zmx
+      # zmx comes from a third-party tap whose formula fetches a prebuilt
+      # binary; it has no Linux bottle, so its install is gated behind
+      # DevelopmentTools.installed? (satisfied by glibc+gcc above).
+      - name: neurosnap/tap/zmx
         binary: zmx
       - name: zoxide
         binary: zoxide

@@ -1,0 +1,67 @@
+#!{{ lookPath "bash" }}
+
+# Create unversioned gcc/cc/g++/c++ symlinks in Homebrew's bin directory.
+#
+# Why this exists
+# ---------------
+# Homebrew's `gcc` formula installs only *versioned* binaries (gcc-16, g++-16,
+# ...) because it is built with `--program-suffix=-<major>`. It deliberately
+# relies on the *host* to provide unversioned /usr/bin/gcc and /usr/bin/cc.
+#
+# On Fedora Silverblue/atomic there is no system C compiler (no /usr/bin/gcc,
+# no glibc-devel on the immutable host image). As a result:
+#
+#   - Homebrew's `DevelopmentTools.installed?` returns false, because it calls
+#     `locate("gcc")`, which checks (in order) $HOMEBREW_PREFIX/opt/binutils/bin,
+#     $HOMEBREW_PREFIX/opt/glibc/bin, $HOMEBREW_PREFIX/bin, and /usr/bin - and
+#     finds no `gcc` in any of them.
+#   - That gate blocks *every* non-bottled formula install, including formulas
+#     that only fetch a prebuilt binary (e.g. neurosnap/tap/zmx), with the
+#     misleading message "Install Clang or run `brew install gcc`".
+#
+# Homebrew has no MacPorts-`activate`-style mechanism to select or alias a
+# version: `brew link` only links the names the formula actually installed
+# (the versioned ones), and versioned formulae (gcc@14, etc.) still produce
+# versioned binaries only. The established Linuxbrew workaround on a
+# compiler-less host is to create these unversioned aliases by hand in
+# $HOMEBREW_PREFIX/bin.
+#
+# What this script does
+# ---------------------
+# After the brew package list is applied (so `gcc` is installed), create the
+# unversioned symlinks gcc -> gcc-<ver>, cc -> gcc-<ver>, g++ -> g++-<ver>,
+# c++ -> g++-<ver> in $HOMEBREW_PREFIX/bin. Idempotent: existing symlinks are
+# left untouched, and the script is a no-op if no versioned gcc is present.
+#
+# This is a userspace-only operation under $HOMEBREW_PREFIX; it writes nothing
+# to the read-only /usr.
+
+{{ if eq .chezmoi.os "linux" -}}
+set -eu
+
+if [ -d "{{ .chezmoi.homeDir }}/.linuxbrew/bin" ]; then
+  HB_BIN="{{ .chezmoi.homeDir }}/.linuxbrew/bin"
+elif [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
+  HB_BIN="/home/linuxbrew/.linuxbrew/bin"
+else
+  echo "No Homebrew prefix found; skipping gcc alias creation."
+  exit 0
+fi
+
+GCC_VER="$(ls "$HB_BIN" 2>/dev/null | grep -Eo '^gcc-[0-9]+$' | head -n1 | grep -Eo '[0-9]+$')"
+if [ -z "$GCC_VER" ]; then
+  echo "No versioned gcc (gcc-<n>) found in $HB_BIN; skipping gcc alias creation."
+  exit 0
+fi
+
+for pair in "gcc:gcc-$GCC_VER" "cc:gcc-$GCC_VER" "g++:g++-$GCC_VER" "c++:g++-$GCC_VER"; do
+  from="${pair%%:*}"
+  to="${pair##*:}"
+  if [ -e "$HB_BIN/$to" ] && [ ! -e "$HB_BIN/$from" ]; then
+    ln -s "$to" "$HB_BIN/$from"
+    echo "Created $HB_BIN/$from -> $to"
+  elif [ -e "$HB_BIN/$from" ]; then
+    echo "$HB_BIN/$from already exists; leaving as-is."
+  fi
+done
+{{ end -}}

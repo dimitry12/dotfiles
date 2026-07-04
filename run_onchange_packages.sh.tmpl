@@ -59,12 +59,19 @@ fi
 
 # Install Homebrew packages. Skip packages whose primary binary is already
 # available, which helps when a base distro or toolbox already provides them.
+# Entries without a `binary` (e.g. keg-only formulae like glibc, whose
+# binaries shadow system runtime tools) are always passed to `brew install`,
+# which is itself idempotent.
 {{ range .packages.linux.homebrew -}}
+{{- if hasKey . "binary" -}}
 if command -v {{ .binary | quote }} >/dev/null 2>&1; then
   echo "{{ .binary }} already available; skipping brew install {{ .name }}."
 else
   brew install {{ .name | quote }}
 fi
+{{- else -}}
+brew install {{ .name | quote }}
+{{- end }}
 {{ end -}}
 
 # Install Flatpak applications when Flatpak is available.

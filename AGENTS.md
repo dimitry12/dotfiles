@@ -93,6 +93,67 @@ providers, not as a full live-session backup.
   host-specific paths in cross-platform files. If a host-specific path is needed,
   keep it inside an OS-specific template branch.
 
+## Session startup
+
+At the start of every new session, identify the current system before doing
+anything else, because this repository is applied across multiple machines
+(macOS, Fedora Silverblue/atomic, Ubuntu, etc.) with different package
+managers, paths, and capabilities:
+
+- Detect the OS and distribution with `uname -s` and, on Linux, check
+  `/etc/os-release` (for example, look for `VARIANT_ID=silverblue` or similar
+  atomic identifiers).
+- Note the hostname with `hostname` so host-specific behavior can be applied.
+- Confirm key tool availability relevant to the task (`chezmoi`, `brew`,
+  `flatpak`, `uv`, `gpg`, etc.) with `command -v` rather than assuming.
+
+Use the detected environment to pick the correct platform branches in templates
+and scripts, and to avoid suggesting commands or paths that do not exist on the
+current host.
+
+## Periodic maintenance
+
+Periodically (and at least when major CVEs or breaking changes surface) the
+user should be prompted to run a maintenance review of everything this repo
+installs. Agents working in this repository should remind the user of the
+following two reviews when relevant (for example during a `chezmoi apply`, a
+package-list change, or a security audit):
+
+1. **Vulnerability review of all installed packages, including Pi add-on
+   dependencies.** Audit every layer this repository manages for known
+   vulnerabilities:
+   - Homebrew: `brew audit` / `brew outdated` and review the formulae list.
+   - Flatpak: `flatpak update` and review installed refs.
+   - npm global tools and Pi extension/skill `node_modules` (under
+     `~/.pi/agent/{extensions,skills}` and the external contrib repo): run
+     `npm audit` in each directory with a `package-lock.json`.
+   - `uv tool` installs: `uv tool list` and check each tool's dependencies
+     (for example `uv tool run --from <tool> pip-audit`, or reinstall to pull
+     patched transitive deps).
+   - MacPorts (macOS): `port outdated` and review the macports list.
+   Review any CVEs reported and either bump, pin, or remove the affected
+   package. Pinned versions in this repo (see "Handling dependencies" in the
+   global AGENTS) should be re-justified at this time.
+
+2. **Manager-fit review: brew vs. `uv tool` vs. npm global.** Go through the
+   lists in `.chezmoidata/packages.yaml` (`linux.homebrew`, `darwin.homebrew`,
+   `darwin.macports`, `npm_global`, `uv_tool`, `termux`) and reconsider, for
+   each tool, whether it is managed by the most appropriate manager:
+   - Tools available as a Homebrew formula and used as a general CLI should
+     generally be a brew formula (so they get `brew audit`/`brew bump` and
+     bottle updates) rather than a `cargo install`/`go install`/`uv tool`/
+     npm global install.
+   - Python-only CLI tools that are not in Homebrew (or where the brew formula
+     lags badly) belong in `uv_tool`.
+   - JavaScript/Node-only tools belong in `npm_global` only when no brew
+     formula exists or the formula is unsuitable.
+   - Move tools in the direction that reduces the number of managers and keeps
+     update/audit coverage best-in-class. Update `.chezmoidata/packages.yaml`
+     and the relevant onchange scripts accordingly.
+
+Keep notes of decisions (and the "why") in CONSTRAINTS.md per the global
+AGENTS rules.
+
 ## Working guidelines for agents
 
 - This repository is public: do not commit secrets, private tokens, host-specific
