@@ -38,7 +38,6 @@ script and supporting templates. It covers:
 - Cross-platform shell-based installations where appropriate.
 - `uv` tool installations for Python command-line tools.
 - `llm` plugin installation for extending Datasette `llm` functionality.
-- Tmux Plugin Manager (TPM) for tmux plugins.
 
 ## Working guidelines for agents
 

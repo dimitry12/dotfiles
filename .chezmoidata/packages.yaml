@@ -2,7 +2,6 @@ packages:
   darwin:
     macports:
       - neovim
-      - tmux
       - gnupg2
       - lazygit
       - sops
@@ -25,7 +24,6 @@ packages:
     - ripgrep
     - clang
     - neovim
-    - tmux
     - rust
     - python
     - uv
@@ -49,7 +47,6 @@ packages:
   linux:
     ubuntu:
       - neovim
-      - tmux
       - fd-find
       - ripgrep
       - fzf
@@ -66,7 +63,6 @@ packages:
     - strip-tags
     - dvc
     - visidata
-    - aider-chat@latest
     - python-dotenv
   llm_plugins:
     - llm-ollama

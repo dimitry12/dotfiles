@@ -27,7 +27,7 @@ config.keys = {
 		}),
 	},
 
-	-- 2. Fuzzy switch by name (the tmux `prefix + s` equivalent)
+	-- 2. Fuzzy switch by workspace name
 	{
 		key = "s",
 		mods = "CTRL|SHIFT",
