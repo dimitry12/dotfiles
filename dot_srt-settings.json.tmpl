@@ -29,16 +29,12 @@
       "~/.cache/Homebrew"{{ end }}
     ],
     "allowWrite": [
-      ".",
-      "./.pi/mcp-results/"
+      "."
     ],
     "denyWrite": [
       "/comment protect the file history in case agent wrecks worktree",
       "./.git",
-      "./.pi",
-      "./.pi/sandbox.json",
-      "./.pi/mcp.json",
-      "./.pi/mcp-result-spooler.json"
+      "./.pi"
     ]
   }
 }

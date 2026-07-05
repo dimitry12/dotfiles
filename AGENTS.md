@@ -92,6 +92,25 @@ managed templates. Volatile OAuth/session credentials should not be tracked.
 `~/.pi/agent/auth.json` is treated as a bootstrap template for stable API-key
 providers, not as a full live-session backup.
 
+## SRT sandbox configuration
+
+Global SRT sandbox settings are managed by `dot_srt-settings.json.tmpl`, which
+renders to `~/.srt-settings.json`. The intended filesystem policy is:
+
+- allow writes to the project current working directory (`.`) only;
+- deny writes to `./.git` to protect repository history;
+- deny writes to the entire project-local `./.pi` path;
+- do not add child allow/deny exceptions under `./.pi`, including
+  `./.pi/mcp-results/`.
+
+On Linux, SRT uses bubblewrap (`bwrap`). If `./.pi` is denied while a child such
+as `./.pi/mcp-results/` is allowed, and `./.pi` does not already exist as a
+directory, bwrap/SRT can materialize or mask `./.pi` as a regular mount-point
+file to enforce the rules. That can break even read operations with errors like
+`bwrap: Can't mkdir <cwd>/.pi: Not a directory`. macOS sandboxing does not use
+these bwrap mount mechanics, so the same nested exception policy may appear to
+work there but fail on Linux.
+
 ## Portability conventions
 
 - Prefer OS-aware templates over hardcoded host paths.
