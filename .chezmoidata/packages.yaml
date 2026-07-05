@@ -79,6 +79,8 @@ packages:
         binary: go
       - name: lazygit
         binary: lazygit
+      - name: make
+        binary: make
       - name: neovim
         binary: nvim
       - name: node
@@ -95,6 +97,11 @@ packages:
         binary: sops
       - name: uv
         binary: uv
+      # wtype provides Wayland virtual-keyboard text insertion for Handy's
+      # speech-to-text paste. Works on wlroots-style compositors including
+      # niri (virtual-keyboard-unstable-v1).
+      - name: wtype
+        binary: wtype
       - name: zk
         binary: zk
       # zmx comes from a third-party tap whose formula fetches a prebuilt
@@ -106,6 +113,14 @@ packages:
         binary: zoxide
     flatpak:
       - org.wezfurlong.wezterm
+    # Handy is distributed as an AppImage (the Flatpak is not on Flathub yet;
+    # tracked in upstream issue #1555). The AppImage is downloaded by
+    # run_onchange_handy_appimage.sh.tmpl. When Flathub publication lands,
+    # move this to `flatpak:` as `com.pais.handy` and delete the onchange
+    # script + the wtype entry above (Flatpak bundles its own text-input path).
+    handy:
+      version: "0.9.0"
+      url: "https://github.com/cjpais/Handy/releases/download/v0.9.0/Handy_0.9.0_amd64.AppImage"
   npm_global:
     - package: "@earendil-works/pi-coding-agent"
       binary: "pi"
