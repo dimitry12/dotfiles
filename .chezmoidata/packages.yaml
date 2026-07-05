@@ -45,6 +45,25 @@ packages:
     - syncthing
     - mutt
   linux:
+    # Fedora atomic/Silverblue host packages for the Wayland compositor/session.
+    # These integrate with the display manager, portals, input, and lock/session
+    # stack, so they are managed at the host layer instead of Homebrew/Flatpak.
+    rpm_ostree:
+      - niri
+      - xwayland-satellite
+      - xdg-desktop-portal-gnome
+      - xdg-desktop-portal-gtk
+      - gnome-keyring
+      - fuzzel
+      - waybar
+      - mako
+      - swaybg
+      - swaylock
+      - swayidle
+      - wl-clipboard
+      - brightnessctl
+      - playerctl
+      - lxpolkit
     homebrew:
       # glibc must precede gcc: brew's gcc postinstall has two branches and
       # takes the self-contained one (using glibc.opt_lib for crt objects) only
@@ -97,11 +116,6 @@ packages:
         binary: sops
       - name: uv
         binary: uv
-      # wtype provides Wayland virtual-keyboard text insertion for Handy's
-      # speech-to-text paste. Works on wlroots-style compositors including
-      # niri (virtual-keyboard-unstable-v1).
-      - name: wtype
-        binary: wtype
       - name: zk
         binary: zk
       # zmx comes from a third-party tap whose formula fetches a prebuilt
@@ -113,14 +127,11 @@ packages:
         binary: zoxide
     flatpak:
       - org.wezfurlong.wezterm
-    # Handy is distributed as an AppImage (the Flatpak is not on Flathub yet;
-    # tracked in upstream issue #1555). The AppImage is downloaded by
-    # run_onchange_handy_appimage.sh.tmpl. When Flathub publication lands,
-    # move this to `flatpak:` as `com.pais.handy` and delete the onchange
-    # script + the wtype entry above (Flatpak bundles its own text-input path).
-    handy:
-      version: "0.9.0"
-      url: "https://github.com/cjpais/Handy/releases/download/v0.9.0/Handy_0.9.0_amd64.AppImage"
+      # Speed of Sound is the current Linux speech-to-text choice. It uses XDG
+      # Desktop Portals for GNOME Wayland text output, avoiding Handy's
+      # wtype/ydotool compositor-specific workarounds. Network access is denied
+      # by ~/.local/share/flatpak/overrides/io.speedofsound.SpeedOfSound.
+      - io.speedofsound.SpeedOfSound
   npm_global:
     - package: "@earendil-works/pi-coding-agent"
       binary: "pi"

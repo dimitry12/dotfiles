@@ -1,0 +1,66 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 30,
+  "spacing": 8,
+
+  "modules-left": ["niri/workspaces"],
+  "modules-center": ["niri/window"],
+  "modules-right": ["tray", "network", "pulseaudio", "backlight", "battery", "clock"],
+
+  "niri/workspaces": {
+    "format": "{value}",
+    "format-icons": {
+      "active": "*",
+      "focused": "*",
+      "urgent": "!",
+      "empty": "-",
+      "default": "•"
+    }
+  },
+
+  "niri/window": {
+    "format": "{app_id}: {title}",
+    "icon": true,
+    "icon-size": 16,
+    "separate-outputs": true,
+    "max-length": 90
+  },
+
+  "tray": {
+    "icon-size": 16,
+    "spacing": 8
+  },
+
+  "network": {
+    "format-wifi": "Wi-Fi {essid}",
+    "format-ethernet": "wired",
+    "format-disconnected": "offline",
+    "tooltip-format": "{ifname}: {ipaddr}/{cidr}"
+  },
+
+  "pulseaudio": {
+    "format": "vol {volume}%",
+    "format-muted": "muted",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+
+  "backlight": {
+    "format": "sun {percent}%"
+  },
+
+  "battery": {
+    "states": {
+      "warning": 30,
+      "critical": 15
+    },
+    "format": "bat {capacity}%",
+    "format-charging": "chg {capacity}%",
+    "format-plugged": "AC {capacity}%"
+  },
+
+  "clock": {
+    "format": "{:%a %Y-%m-%d %H:%M}",
+    "tooltip-format": "<tt>{calendar}</tt>"
+  }
+}

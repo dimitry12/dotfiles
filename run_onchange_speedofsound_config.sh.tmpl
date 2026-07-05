@@ -1,0 +1,76 @@
+#!{{ lookPath "bash" }}
+
+# Configure Speed of Sound settings that are not clean standalone files.
+#
+# File-managed pieces live elsewhere:
+# - ~/.local/share/flatpak/overrides/io.speedofsound.SpeedOfSound denies network
+# - ~/.local/bin/speedofsound-trigger triggers the app over D-Bus
+# - ~/.config/autostart/io.speedofsound.SpeedOfSound.desktop starts it on login
+#
+# Speed of Sound's own GSettings keyfile also contains GNOME's machine/session-
+# specific Remote Desktop portal restore token, so this script sets only the
+# individual portable keys instead of replacing the whole keyfile.
+
+{{ if eq .chezmoi.os "linux" -}}
+set -euo pipefail
+
+APP_ID=io.speedofsound.SpeedOfSound
+TRIGGER={{ printf "%s/.local/bin/speedofsound-trigger" .chezmoi.homeDir | quote }}
+
+if command -v flatpak >/dev/null 2>&1 && flatpak info "$APP_ID" >/dev/null 2>&1; then
+  # Use the portal-based output path; it works on GNOME Wayland and should also
+  # keep working under niri when the relevant portals are available.
+  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound text-output-method 'portal'
+  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound append-space true
+  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound stay-hidden-on-activation true
+  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound background-recording true
+  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound hide-instead-of-minimize true
+else
+  echo "$APP_ID is not installed yet; skipping Speed of Sound app settings."
+fi
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "python3 not found; skipping Speed of Sound GNOME shortcut."
+  exit 0
+fi
+
+if command -v gsettings >/dev/null 2>&1; then
+  case "${XDG_CURRENT_DESKTOP:-}" in
+    *GNOME*)
+      media_schema=org.gnome.settings-daemon.plugins.media-keys
+      shortcut_schema=org.gnome.settings-daemon.plugins.media-keys.custom-keybinding
+      shortcut_path=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/speedofsound-trigger/
+
+      current=$(gsettings get "$media_schema" custom-keybindings)
+      updated=$(CURRENT="$current" SHORTCUT_PATH="$shortcut_path" python3 - <<'PY'
+import ast
+import os
+
+raw = os.environ['CURRENT'].strip()
+path = os.environ['SHORTCUT_PATH']
+if raw in ('', '@as []', '[]'):
+    values = []
+else:
+    values = ast.literal_eval(raw)
+if path not in values:
+    values.append(path)
+print('[' + ', '.join(repr(v) for v in values) + ']')
+PY
+)
+
+      gsettings set "$media_schema" custom-keybindings "$updated"
+      gsettings set "$shortcut_schema:$shortcut_path" name 'Speed of Sound'
+      gsettings set "$shortcut_schema:$shortcut_path" command "$TRIGGER"
+      # Tested on this laptop: the Copilot key emits Super+Shift+F23.
+      gsettings set "$shortcut_schema:$shortcut_path" binding '<Super><Shift>F23'
+      ;;
+    *)
+      echo "Current desktop is not GNOME; skipping GNOME Speed of Sound shortcut."
+      ;;
+  esac
+else
+  echo "gsettings not found; skipping Speed of Sound GNOME shortcut."
+fi
+{{ else -}}
+echo "Speed of Sound setup is Linux-only; skipping on {{ .chezmoi.os }}."
+{{ end -}}

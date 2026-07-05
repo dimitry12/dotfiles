@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Trigger Speed of Sound via its documented D-Bus action.
+# For Flatpak installs, D-Bus activation starts the app if needed.
+gdbus call \
+  --session \
+  --dest io.speedofsound.SpeedOfSound \
+  --object-path /io/speedofsound/SpeedOfSound \
+  --method org.gtk.Actions.Activate "trigger" [] {}

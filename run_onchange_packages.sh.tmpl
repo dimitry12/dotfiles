@@ -41,6 +41,26 @@ echo "Installing {{ $name }}..."
 
 {{ if eq .chezmoi.os "linux" -}}
 
+# Install host-level rpm-ostree packages on Fedora atomic/Silverblue systems.
+# These are for compositor/session components that need host integration and
+# are not good fits for Homebrew or Flatpak.
+{{ if .packages.linux.rpm_ostree -}}
+if command -v rpm-ostree >/dev/null 2>&1; then
+  rpm_ostree_packages=(
+{{ range .packages.linux.rpm_ostree -}}
+    {{ . | quote }}
+{{ end -}}
+  )
+  if [ "$(id -u)" -eq 0 ]; then
+    rpm-ostree install --idempotent --allow-inactive "${rpm_ostree_packages[@]}"
+  else
+    sudo rpm-ostree install --idempotent --allow-inactive "${rpm_ostree_packages[@]}"
+  fi
+else
+  echo "rpm-ostree not found; skipping Linux host rpm-ostree packages."
+fi
+{{ end -}}
+
 # Linux uses Homebrew for CLI/dev tools across mutable and atomic distributions
 # such as Ubuntu, Fedora Workstation, and Fedora Silverblue.
 if ! command -v brew >/dev/null 2>&1; then
