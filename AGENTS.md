@@ -48,6 +48,41 @@ acceptable binary already exists from the base OS, toolbox, or another manager.
 
 `llm` is intentionally not managed in this repository anymore.
 
+## Configuration management style
+
+Prefer managing durable configuration as files when the backing store is a
+stable, documented file format. Good examples include Flatpak override files,
+`.desktop` autostart entries, launcher scripts under `~/.local/bin`, niri KDL,
+and Waybar JSON/CSS. Use commands or onchange scripts only for settings whose
+authoritative API is not a plain file, such as GNOME dconf/GSettings, package
+installation, or per-machine portal consent.
+
+Avoid replacing whole generated settings files when they mix portable user
+preferences with machine/session-specific state. For example, Flatpak app
+GSettings keyfiles can contain XDG Desktop Portal restore tokens; set individual
+portable keys with `gsettings` instead of source-controlling the entire keyfile.
+
+## Desktop speech-to-text decision notes
+
+Linux dictation was evaluated primarily on Fedora Silverblue GNOME Wayland,
+where direct text injection into another app is intentionally restricted by
+Wayland. The preferred architecture is XDG Desktop Portals: GNOME owns consent
+and the global shortcut, and the app uses the Remote Desktop portal to type into
+the focused app.
+
+Handy was removed from this repository for now. Although it is popular and works
+well in some environments, the current GNOME Wayland path required fragile
+compositor/input workarounds (`wtype` is unsupported by Mutter, while
+`ydotool`/`dotool` require privileged input plumbing). Reconsider Handy only if
+upstream Flatpak/portal support matures enough to avoid those workarounds.
+
+Speed of Sound is the current Linux speech-to-text choice because it works with
+GNOME Wayland through XDG Desktop Portals and can be installed from Flathub. Its
+network access is denied with a managed Flatpak override for offline/privacy
+use. The Remote Desktop portal consent and restore token are intentionally not
+managed by this repo; the user must accept the GNOME permission dialog on each
+new machine/session identity when required.
+
 ## Bootstrap assumptions
 
 For a new desktop Linux machine, the intended bootstrap is:
@@ -118,6 +153,24 @@ work there but fail on Linux.
 - Avoid hardcoded `/Users/dzmitry`, `/home/dzmitry`, `/opt/local`, or similar
   host-specific paths in cross-platform files. If a host-specific path is needed,
   keep it inside an OS-specific template branch.
+
+## Privilege elevation and trusted command paths
+
+For privileged commands in agent sessions, prefer `/usr/bin/pkexec` over
+`sudo`. `sudo` prompts in the terminal, which the agent cannot answer and which
+is easier to spoof with a user-space executable named `sudo`. `pkexec` delegates
+authentication to the desktop polkit agent so the password prompt is surfaced to
+the user instead of the requesting process.
+
+Always invoke privilege-elevation tools by absolute path, especially
+`/usr/bin/pkexec` and `/usr/bin/sudo`, so user-writable `PATH` entries such as
+`~/.local/bin`, Homebrew, npm, cargo, or Pi agent shims cannot shadow the real
+system binaries.
+
+Bash startup intentionally normalizes Linux `PATH` so immutable/system command
+directories (`/usr/bin`, `/bin`, `/usr/sbin`, `/sbin`) are searched before
+user-writable tool directories. Keep this ordering unless there is a documented,
+security-reviewed reason to allow a user-space tool to override a system command.
 
 ## Session startup
 

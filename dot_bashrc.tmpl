@@ -246,6 +246,31 @@ if [ -r "$HOME/.cargo/env" ]; then
   . "$HOME/.cargo/env"
 fi
 
+{{ if eq .chezmoi.os "linux" }}
+# Security-sensitive PATH normalization for Linux/Fedora Silverblue.
+# Keep real OS commands (notably /usr/bin/sudo and /usr/bin/pkexec) ahead of
+# user-writable tool directories such as Homebrew, ~/.local/bin, npm/cargo shims,
+# and Pi agent helpers. This reduces the chance that a fake user-space command
+# can shadow a system binary and steal an elevation password or alter behavior.
+_system_command_path="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin"
+_normalized_path="$_system_command_path"
+_old_ifs="$IFS"
+IFS=:
+for _path_entry in $PATH; do
+  [ -n "$_path_entry" ] || continue
+  case ":$_system_command_path:" in
+    *:"$_path_entry":*) continue ;;
+  esac
+  case ":$_normalized_path:" in
+    *:"$_path_entry":*) ;;
+    *) _normalized_path="$_normalized_path:$_path_entry" ;;
+  esac
+done
+IFS="$_old_ifs"
+export PATH="$_normalized_path"
+unset _system_command_path _normalized_path _old_ifs _path_entry
+{{ end }}
+
 if [[ -n $ZMX_SESSION ]]; then
   export PS1="[$ZMX_SESSION] ${PS1}"
 fi
