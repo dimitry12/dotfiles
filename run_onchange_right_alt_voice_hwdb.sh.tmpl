@@ -1,0 +1,61 @@
+#!{{ lookPath "bash" }}
+
+# Remap Right Alt / AltGr to F24 on Linux so GNOME can use it as a
+# standalone custom shortcut trigger for Speed of Sound voice input.
+#
+# GNOME custom shortcuts do not fire for a lone modifier key like Right Alt.
+# systemd-hwdb can remap the keyboard's hardware scancode to a normal keycode
+# before GNOME sees it. F24 is intentionally obscure and unused by normal typing.
+
+{{ if eq .chezmoi.os "linux" -}}
+set -euo pipefail
+
+TARGET=/etc/udev/hwdb.d/90-right-alt-voice.hwdb
+
+if [ ! -x /usr/bin/systemd-hwdb ] || [ ! -x /usr/bin/udevadm ]; then
+  echo "systemd-hwdb or udevadm not found; skipping Right Alt voice hwdb remap."
+  exit 0
+fi
+
+if [ ! -x /usr/bin/pkexec ]; then
+  echo "pkexec not found; cannot install Right Alt voice hwdb remap."
+  exit 0
+fi
+
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+
+printf '%s\n' \
+  '# Remap Right Alt / AltGr to F24 so GNOME can use it as a standalone' \
+  '# custom shortcut trigger for Speed of Sound voice input.' \
+  '#' \
+  '# USB HID Right Alt usage is 0x700e6. The atkbd scancode e038 covers' \
+  '# internal PS/2-style laptop keyboards.' \
+  '' \
+  '# USB keyboards, including Apple Magic Keyboard.' \
+  'evdev:input:b0003v*p*' \
+  ' KEYBOARD_KEY_700e6=f24' \
+  '' \
+  '# Bluetooth keyboards.' \
+  'evdev:input:b0005v*p*' \
+  ' KEYBOARD_KEY_700e6=f24' \
+  '' \
+  '# Internal AT laptop keyboards.' \
+  'evdev:atkbd:dmi:*' \
+  ' KEYBOARD_KEY_e038=f24' \
+  >"$tmp"
+
+if [ -r "$TARGET" ] && cmp -s "$tmp" "$TARGET"; then
+  echo "Right Alt voice hwdb remap is already installed."
+  exit 0
+fi
+
+/usr/bin/pkexec /bin/sh -c '
+  set -eu
+  /usr/bin/install -m 0644 -o root -g root "$1" "$2"
+  /usr/bin/systemd-hwdb update
+  /usr/bin/udevadm trigger -s input
+' sh "$tmp" "$TARGET"
+{{ else -}}
+echo "Right Alt voice hwdb remap is Linux-only; skipping on {{ .chezmoi.os }}."
+{{ end -}}

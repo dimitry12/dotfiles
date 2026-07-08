@@ -39,10 +39,15 @@ if command -v gsettings >/dev/null 2>&1; then
     *GNOME*)
       media_schema=org.gnome.settings-daemon.plugins.media-keys
       shortcut_schema=org.gnome.settings-daemon.plugins.media-keys.custom-keybinding
-      shortcut_path=/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/speedofsound-trigger/
 
-      current=$(gsettings get "$media_schema" custom-keybindings)
-      updated=$(CURRENT="$current" SHORTCUT_PATH="$shortcut_path" python3 - <<'PY'
+      add_custom_shortcut() {
+        local shortcut_path=$1
+        local shortcut_name=$2
+        local shortcut_binding=$3
+        local current updated
+
+        current=$(gsettings get "$media_schema" custom-keybindings)
+        updated=$(CURRENT="$current" SHORTCUT_PATH="$shortcut_path" python3 - <<'PY'
 import ast
 import os
 
@@ -58,11 +63,24 @@ print('[' + ', '.join(repr(v) for v in values) + ']')
 PY
 )
 
-      gsettings set "$media_schema" custom-keybindings "$updated"
-      gsettings set "$shortcut_schema:$shortcut_path" name 'Speed of Sound'
-      gsettings set "$shortcut_schema:$shortcut_path" command "$TRIGGER"
+        gsettings set "$media_schema" custom-keybindings "$updated"
+        gsettings set "$shortcut_schema:$shortcut_path" name "$shortcut_name"
+        gsettings set "$shortcut_schema:$shortcut_path" command "$TRIGGER"
+        gsettings set "$shortcut_schema:$shortcut_path" binding "$shortcut_binding"
+      }
+
       # Tested on this laptop: the Copilot key emits Super+Shift+F23.
-      gsettings set "$shortcut_schema:$shortcut_path" binding '<Super><Shift>F23'
+      add_custom_shortcut \
+        /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/speedofsound-trigger/ \
+        'Speed of Sound' \
+        '<Super><Shift>F23'
+
+      # The managed hwdb remap turns Right Alt/AltGr into F24, giving GNOME a
+      # non-modifier key it can use as a standalone custom shortcut trigger.
+      add_custom_shortcut \
+        /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/speedofsound-trigger-f24/ \
+        'Speed of Sound Right Alt' \
+        'F24'
       ;;
     *)
       echo "Current desktop is not GNOME; skipping GNOME Speed of Sound shortcut."
