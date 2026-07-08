@@ -17,14 +17,14 @@ set -euo pipefail
 APP_ID=io.speedofsound.SpeedOfSound
 TRIGGER={{ printf "%s/.local/bin/speedofsound-trigger" .chezmoi.homeDir | quote }}
 
-if command -v flatpak >/dev/null 2>&1 && flatpak info "$APP_ID" >/dev/null 2>&1; then
+if command -v flatpak >/dev/null 2>&1 && flatpak info --user "$APP_ID" >/dev/null 2>&1; then
   # Use the portal-based output path; it works on GNOME Wayland and should also
   # keep working under niri when the relevant portals are available.
-  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound text-output-method 'portal'
-  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound append-space true
-  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound stay-hidden-on-activation true
-  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound background-recording true
-  flatpak run --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound hide-instead-of-minimize true
+  flatpak run --user --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound text-output-method 'portal'
+  flatpak run --user --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound append-space true
+  flatpak run --user --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound stay-hidden-on-activation true
+  flatpak run --user --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound background-recording true
+  flatpak run --user --command=gsettings "$APP_ID" set io.speedofsound.SpeedOfSound hide-instead-of-minimize true
 else
   echo "$APP_ID is not installed yet; skipping Speed of Sound app settings."
 fi

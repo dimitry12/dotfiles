@@ -75,8 +75,8 @@ window-rule {
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
-    Mod+Return hotkey-overlay-title="Open Terminal: WezTerm" { spawn "flatpak" "run" "org.wezfurlong.wezterm"; }
-    Mod+T      hotkey-overlay-title="Open Terminal: WezTerm" { spawn "flatpak" "run" "org.wezfurlong.wezterm"; }
+    Mod+Return hotkey-overlay-title="Open Terminal: WezTerm" { spawn "flatpak" "run" "--user" "org.wezfurlong.wezterm"; }
+    Mod+T      hotkey-overlay-title="Open Terminal: WezTerm" { spawn "flatpak" "run" "--user" "org.wezfurlong.wezterm"; }
     Mod+D      hotkey-overlay-title="Run Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock Screen" { spawn "swaylock" "-f"; }
 

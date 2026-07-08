@@ -1,0 +1,30 @@
+#!{{ lookPath "bash" }}
+
+{{ if eq .chezmoi.os "linux" -}}
+# Prefer the Flatpak Firefox desktop entry for browser launches and URL opens.
+# Fedora's RPM Firefox and Flathub Firefox both use org.mozilla.firefox.desktop;
+# the Flatpak export directory normally appears before /usr/share in
+# XDG_DATA_DIRS, so this desktop ID resolves to the Flatpak once it is installed.
+set -u
+
+app_id="org.mozilla.firefox"
+desktop_id="org.mozilla.firefox.desktop"
+
+if command -v flatpak >/dev/null 2>&1 && flatpak info --user "$app_id" >/dev/null 2>&1; then
+  if command -v xdg-settings >/dev/null 2>&1; then
+    xdg-settings set default-web-browser "$desktop_id" || true
+  fi
+
+  if command -v xdg-mime >/dev/null 2>&1; then
+    for mime_type in \
+      x-scheme-handler/http \
+      x-scheme-handler/https \
+      text/html \
+      application/xhtml+xml; do
+      xdg-mime default "$desktop_id" "$mime_type" || true
+    done
+  fi
+else
+  echo "Flatpak Firefox is not installed; skipping default-browser setup."
+fi
+{{ end -}}

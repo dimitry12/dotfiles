@@ -94,13 +94,14 @@ brew install {{ .name | quote }}
 {{- end }}
 {{ end -}}
 
-# Install Flatpak applications when Flatpak is available.
+# Install Flatpak applications when Flatpak is available. Use the per-user
+# installation explicitly so hosts with both system and user Flathub remotes do
+# not prompt for an installation scope during unattended chezmoi apply.
 if command -v flatpak >/dev/null 2>&1; then
-  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-  # Fedora ships flathub as a disabled remote; ensure it is enabled so installs succeed.
-  flatpak remote-modify --enable flathub 2>/dev/null || true
+  flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  flatpak remote-modify --user --enable flathub 2>/dev/null || true
 {{ range .packages.linux.flatpak -}}
-  flatpak install -y flathub {{ . | quote }}
+  flatpak install --user -y flathub {{ . | quote }}
 {{ end -}}
 else
   echo "flatpak not found; skipping Linux GUI/app Flatpaks."

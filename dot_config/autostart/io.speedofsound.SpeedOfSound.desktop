@@ -6,7 +6,7 @@ Comment=Voice typing for the Linux desktop
 Categories=Utility;Accessibility;
 Keywords=voice;typing;dictation;transcription;speech;microphone;whisper;
 Icon=io.speedofsound.SpeedOfSound
-Exec=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=speedofsound io.speedofsound.SpeedOfSound
+Exec=/usr/bin/flatpak run --user --branch=stable --arch=x86_64 --command=speedofsound io.speedofsound.SpeedOfSound
 Terminal=false
 StartupNotify=true
 DBusActivatable=true

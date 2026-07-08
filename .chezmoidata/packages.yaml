@@ -126,6 +126,10 @@ packages:
       - name: zoxide
         binary: zoxide
     flatpak:
+      # Prefer the Flatpak Firefox on Linux desktops for an additional app-level
+      # sandbox around the browser package, while leaving the OS-provided
+      # Firefox package alone on Fedora atomic systems.
+      - org.mozilla.firefox
       - org.wezfurlong.wezterm
       # Speed of Sound is the current Linux speech-to-text choice. It uses XDG
       # Desktop Portals for GNOME Wayland text output, avoiding Handy's
