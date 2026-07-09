@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+
+# Launch Flathub Firefox after synchronizing the managed extension policy.
+# Firefox release builds do not accept a policy-file path on the command line,
+# so this wrapper writes the policy to the Flatpak app deployment that Firefox
+# already reads: files/lib/firefox/distribution/policies.json.
+set -u
+
+app_id="org.mozilla.firefox"
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/firefox-flatpak"
+extensions_config="$config_dir/extensions.json"
+sidebery_settings="$config_dir/sidebery_settings.json"
+
+flatpak_location() {
+  flatpak info --show-location --user "$app_id" 2>/dev/null \
+    || flatpak info --show-location "$app_id" 2>/dev/null
+}
+
+generate_policy() {
+  python3 - "$extensions_config" "$sidebery_settings" <<'PY'
+import json
+import pathlib
+import sys
+
+extensions_path = pathlib.Path(sys.argv[1])
+sidebery_settings_path = pathlib.Path(sys.argv[2])
+
+with extensions_path.open(encoding="utf-8") as f:
+    configured_extensions = json.load(f)["extensions"]
+
+extension_settings = {}
+for extension in configured_extensions:
+    extension_id = extension["id"]
+    amo_slug = extension["amo_slug"]
+    extension_settings[extension_id] = {
+        "installation_mode": extension.get("installation_mode", "normal_installed"),
+        "install_url": f"https://addons.mozilla.org/firefox/downloads/latest/{amo_slug}/latest.xpi",
+    }
+
+policies = {
+    "policies": {
+        "ExtensionSettings": extension_settings,
+    }
+}
+
+# Sidebery supports Firefox managed storage. SingleFile does not currently read
+# browser.storage.managed, so it is installed here but not configured here.
+sidebery_id = "{3c078156-979c-498b-8990-85f7987dd929}"
+if sidebery_settings_path.exists():
+    with sidebery_settings_path.open(encoding="utf-8") as f:
+        sidebery_settings = json.load(f)
+    policies["policies"].setdefault("3rdparty", {}).setdefault("Extensions", {})[
+        sidebery_id
+    ] = {"settings": sidebery_settings}
+
+json.dump(policies, sys.stdout, indent=2)
+sys.stdout.write("\n")
+PY
+}
+
+sync_policy() {
+  if ! command -v flatpak >/dev/null 2>&1; then
+    echo "flatpak not found; cannot synchronize Firefox policy." >&2
+    return 1
+  fi
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "python3 not found; cannot generate Firefox policy." >&2
+    return 1
+  fi
+  if [ ! -r "$extensions_config" ]; then
+    echo "Firefox extension config not found: $extensions_config" >&2
+    return 1
+  fi
+
+  location="$(flatpak_location)"
+  if [ -z "$location" ]; then
+    echo "Flatpak Firefox is not installed; cannot synchronize Firefox policy." >&2
+    return 1
+  fi
+
+  distribution_dir="$location/files/lib/firefox/distribution"
+  if [ ! -d "$distribution_dir" ]; then
+    echo "Firefox distribution directory not found: $distribution_dir" >&2
+    return 1
+  fi
+  if [ ! -w "$distribution_dir" ]; then
+    echo "Firefox distribution directory is not writable: $distribution_dir" >&2
+    return 1
+  fi
+
+  tmp_policy="$(mktemp "$distribution_dir/.policies.json.XXXXXX")" || return 1
+  if ! generate_policy >"$tmp_policy"; then
+    rm -f "$tmp_policy"
+    return 1
+  fi
+  chmod 0644 "$tmp_policy"
+
+  target_policy="$distribution_dir/policies.json"
+  if [ -f "$target_policy" ] && cmp -s "$tmp_policy" "$target_policy"; then
+    rm -f "$tmp_policy"
+  else
+    mv "$tmp_policy" "$target_policy"
+    echo "Synchronized Firefox policy: $target_policy"
+  fi
+}
+
+if [ "${1:-}" = "--sync-policy-only" ]; then
+  sync_policy
+  exit $?
+fi
+
+if ! sync_policy; then
+  echo "Warning: launching Firefox without synchronized managed policy." >&2
+fi
+
+exec flatpak run --command=firefox --file-forwarding "$app_id" "$@"

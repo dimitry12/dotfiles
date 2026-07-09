@@ -11,6 +11,15 @@ app_id="org.mozilla.firefox"
 desktop_id="org.mozilla.firefox.desktop"
 
 if command -v flatpak >/dev/null 2>&1 && flatpak info --user "$app_id" >/dev/null 2>&1; then
+  firefox_wrapper="$HOME/.local/bin/firefox-flatpak-managed"
+  if [ -x "$firefox_wrapper" ]; then
+    "$firefox_wrapper" --sync-policy-only || true
+  fi
+
+  if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
+  fi
+
   if command -v xdg-settings >/dev/null 2>&1; then
     xdg-settings set default-web-browser "$desktop_id" || true
   fi

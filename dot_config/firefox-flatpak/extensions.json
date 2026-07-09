@@ -1,0 +1,22 @@
+{
+  "extensions": [
+    {
+      "name": "Sidebery",
+      "id": "{3c078156-979c-498b-8990-85f7987dd929}",
+      "amo_slug": "sidebery",
+      "installation_mode": "normal_installed"
+    },
+    {
+      "name": "SingleFile",
+      "id": "{531906d3-e22f-4a6c-a102-8057b88a1a63}",
+      "amo_slug": "single-file",
+      "installation_mode": "normal_installed"
+    },
+    {
+      "name": "Vimium",
+      "id": "{d7742d87-e61d-4b78-b8a1-b469842139fa}",
+      "amo_slug": "vimium-ff",
+      "installation_mode": "normal_installed"
+    }
+  ]
+}

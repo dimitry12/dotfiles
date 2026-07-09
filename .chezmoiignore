@@ -1,6 +1,5 @@
 AGENTS.md
 Makefile
-sidebery_settings.json
 
 {{ if ne .chezmoi.os "android" -}}
 termux*

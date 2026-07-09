@@ -19,6 +19,16 @@ check_data:
 check_template:
 	chezmoi execute-template $${TEMPLATE:-path_or_string}
 
+# Validate Firefox Flatpak extension policy inputs without launching Firefox.
+# The wrapper composes ExtensionSettings and Sidebery managed storage from
+# ~/.config/firefox-flatpak and writes policies.json into the Flatpak app
+# deployment when called with --sync-policy-only.
+check_firefox_flatpak_policy:
+	python3 -m json.tool dot_config/firefox-flatpak/extensions.json >/dev/null
+	python3 -m json.tool dot_config/firefox-flatpak/sidebery_settings.json >/dev/null
+	bash -n private_dot_local/bin/executable_firefox-flatpak-managed
+	chezmoi execute-template private_dot_local/private_share/applications/org.mozilla.firefox.desktop.tmpl >/dev/null
+
 # Validate the niri config when niri is installed on the current host.
 check_niri:
 	@if command -v niri >/dev/null 2>&1; then \

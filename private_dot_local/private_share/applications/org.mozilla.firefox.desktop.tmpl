@@ -1,0 +1,27 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Firefox
+GenericName=Web Browser
+Comment=Fast and private browser
+Exec={{ .chezmoi.homeDir }}/.local/bin/firefox-flatpak-managed @@u %u @@
+Terminal=false
+Icon=org.mozilla.firefox
+StartupWMClass=firefox
+DBusActivatable=false
+Categories=GNOME;GTK;Network;WebBrowser;
+MimeType=application/json;application/pdf;application/rdf+xml;application/rss+xml;application/x-xpinstall;application/xhtml+xml;application/xml;audio/flac;audio/ogg;audio/webm;image/avif;image/gif;image/jpeg;image/png;image/svg+xml;image/webp;text/html;text/xml;video/ogg;video/webm;x-scheme-handler/chrome;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/mailto;
+StartupNotify=true
+Actions=new-window;new-private-window;open-profile-manager;
+
+[Desktop Action new-window]
+Name=Open a New Window
+Exec={{ .chezmoi.homeDir }}/.local/bin/firefox-flatpak-managed --new-window
+
+[Desktop Action new-private-window]
+Name=Open a New Private Window
+Exec={{ .chezmoi.homeDir }}/.local/bin/firefox-flatpak-managed --private-window
+
+[Desktop Action open-profile-manager]
+Name=Open the Profile Manager
+Exec={{ .chezmoi.homeDir }}/.local/bin/firefox-flatpak-managed --ProfileManager
