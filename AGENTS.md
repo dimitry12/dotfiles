@@ -112,6 +112,9 @@ works.
 
 Pi global configuration under `~/.pi/agent` is managed selectively:
 
+- `~/.pi/agent/AGENTS.md` should be tracked only as a symlink to
+  `../../okf/AGENTS.md` (resolving to `~/okf/AGENTS.md`). The instruction file
+  contents live under `~/okf/` and are not tracked by chezmoi.
 - Personal active resources live in the external repository
   `~/.pi/contrib/dzmitry`, managed by `.chezmoiexternal.toml`.
 - Active Pi resources under `~/.pi/agent/{extensions,skills,prompts}` are tracked
